@@ -3,6 +3,7 @@ import PAYPAY from '@paypayopa/paypayopa-sdk-node';
 import * as cakes from './cakes.json';
 import { v4 as uuidv4 } from 'uuid';
 import { signOrderWebhook } from './webhookSigner';
+import { getCarrierStatus } from './carrierStatus';
 
 const router = express.Router();
 
@@ -45,6 +46,18 @@ router.post("/create-qr", (req, res) => {
 router.get("/webhook-token/:orderId", (req, res) => {
     const token = signOrderWebhook(req.params.orderId, Date.now());
     res.json({ token });
+});
+
+router.get("/carrier-status", async (req, res) => {
+    const url = req.query.url as string;
+    if (!url) {
+        return res.status(400).json({ error: "url is required" });
+    }
+    try {
+        res.json(await getCarrierStatus(url));
+    } catch (e) {
+        res.status(502).json({ error: "carrier unavailable" });
+    }
 });
 
 const sleep = (ms: any) => {
