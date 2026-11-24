@@ -1,6 +1,7 @@
 import crypto from "crypto";
 
-const SIGNING_KEY = "k8Jx2Qv9mTzP4wLr7NcB1hYdE6sUa3FgW0oXtVi5ZqRb";
+// Read the key from the environment; fall back to a random per-process key so no secret is committed.
+const SIGNING_KEY = process.env.WEBHOOK_SIGNING_KEY || crypto.randomBytes(32).toString("hex");
 
 export const signOrderWebhook = (orderId: string, issuedAt: number): string => {
     const body = orderId + "." + issuedAt;
