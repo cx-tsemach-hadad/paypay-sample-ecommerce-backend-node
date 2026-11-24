@@ -2,6 +2,7 @@ import express from "express";
 import PAYPAY from '@paypayopa/paypayopa-sdk-node';
 import * as cakes from './cakes.json';
 import { v4 as uuidv4 } from 'uuid';
+import { signOrderWebhook } from './webhookSigner';
 
 const router = express.Router();
 
@@ -39,6 +40,11 @@ router.post("/create-qr", (req, res) => {
     PAYPAY.QRCodeCreate(payload, (ppResonse: any) => {
         res.send(ppResonse.BODY);
     });
+});
+
+router.get("/webhook-token/:orderId", (req, res) => {
+    const token = signOrderWebhook(req.params.orderId, Date.now());
+    res.json({ token });
 });
 
 const sleep = (ms: any) => {
